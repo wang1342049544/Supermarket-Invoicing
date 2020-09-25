@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.KctDao">
+    <resultMap id="resultmap" type="kct">
+        <id property="id" column="id"></id>
+        <result property="kcId" column="kcId"></result>
+        <result property="sName" column="sName"></result>
+        <result property="danWei" column="danWei"></result>
+        <result property="nums" column="nums"></result>
+        <result property="jprice" column="jprice"></result>
+        <result property="sprice" column="sprice"></result>
+
+        <result property="typeId" column="typeId"></result>
+        <result property="yileld" column="yileld"></result>
+        <result property="pledge" column="pledge"></result>
+        <result property="expiration" column="expiration"></result>
+        <result property="queState" column="queState"></result>
+        <result property="zuiD" column="zuiD"></result>
+        <result property="jifen" column="jifen"></result>
+
+        <result property="remake" column="remake"></result>
+
+
+        <association property="supplier" javaType="supplier">
+            <result property="supName" column="supName"></result>
+        </association>
+        <association property="store" javaType="store">
+            <result property="storeName" column="storeName"></result>
+        </association>
+        <association property="shoptype" javaType="shoptype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+    </resultMap>
+
+    <select id="queryAll" resultType="kct">
+        select * from kct
+    </select>
+
+    <!--查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+
+        select count(1) from kct
+
+        <where>
+            <if test="sName != null and sName != ''">
+                and sName like concat("%",#{sName},"%")
+            </if>
+
+        </where>
+
+
+    </select>
+
+    <!--分页查询i-->
+    <select id="TJquery" parameterType="string" resultMap="resultmap">
+        select * from kct as k inner join supplier as s on k.supplierId = s.supplierId
+        inner join store as t on t.storeId = k.storeId
+        inner join ShopType as st on k.typeId = st.typeId
+        <where>
+            <if test="sName != null and sName != ''">
+                and k.sName like concat("%",#{sName},"%")
+            </if>
+        </where>
+        limit #{offset},#{limit}
+    </select>
+
+
+
+
+    <!--查询是否有相同的商品-->
+    <select id="XTSelect" resultType="kct">
+        select * from kct where kcId = #{kcId} and supplierId = #{supplierId} and storeId = #{storeId} and typeId = #{typeId}
+    </select>
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="kct">
+        insert into KCT(kcId,sName,danWei,nums,jprice,sprice,supplierId,storeId,typeId,yileld,pledge,expiration,queState,zuiD,jifen,remake) values
+        (#{kcId},#{sName},#{danWei},#{nums},#{jprice},#{sprice},#{supplierId},#{storeId},#{typeId},#{yileld},#{pledge},#{expiration},#{queState},#{zuiD},#{jifen},#{remake})
+    </insert>
+
+    <!--修改数量-->
+    <update id="updateNum" parameterType="kct">
+              update kct set nums = #{nums} where kcId = #{kcId} and supplierId = #{supplierId} and storeId = #{storeId} and typeId = #{typeId}
+    </update>
+
+
+    <!--修改数量++进货数量得叠加-->
+    <update id="updateInfo" parameterType="kct">
+              update kct set nums = #{nums} where  Id = #{id}
+    </update>
+
+    <!--根据商品编号查询总数量-->
+    <select id="getCount" resultType="kct">
+        select * from kct where KCId = #{kcId}
+    </select>
+
+    <!--根据Id修改数量-->
+    <update id="xiuNum" parameterType="kct">
+        update kct set nums = #{nums} where KCId = #{kcId}
+    </update>
+
+
+
+
+    <!--  库存数量统计-->
+
+    <select id="zxx" resultType="kct">
+        SELECT KCId,sName,SUM(nums) AS nums FROM kct GROUP BY KCId
+    </select>
+
+
+
+    <update id="jianK" parameterType="long">
+        update kct set nums = nums-#{num} where KCId = #{KCId}
+    </update>
+
+
+    <update id="jiaK" parameterType="long">
+        update kct set nums = nums+#{num} where KCId = #{KCId}
+    </update>
+
+
+    <!--库存预警-->
+    <select id="query" parameterType="string" resultMap="resultmap">
+        select * from kct as k inner join supplier as s on k.supplierId = s.supplierId
+        inner join store as t on t.storeId = k.storeId
+        inner join ShopType as st on k.typeId = st.typeId
+        <where>
+            <if test="sName != null and sName != ''">
+                and k.sName like concat("%",#{sName},"%")
+            </if>
+        </where>
+        and  nums <![CDATA[ < ]]> 20
+        limit #{offset},#{limit}
+
+    </select>
+
+
+    <!--销售过期预警-->
+    <select id="queryy" parameterType="string" resultMap="resultmap">
+        select * from kct as k inner join supplier as s on k.supplierId = s.supplierId
+        inner join store as t on t.storeId = k.storeId
+        inner join ShopType as st on k.typeId = st.typeId
+        <where>
+            <if test="sName != null and sName != ''">
+                and k.sName like concat("%",#{sName},"%")
+            </if>
+        </where>
+        and  expiration <![CDATA[ < ]]> NOW()
+        limit #{offset},#{limit}
+
+    </select>
+
+
+    <!--销售快过期预警 1个月-->
+    <select id="queryyy" parameterType="string" resultMap="resultmap">
+        select * from kct as k inner join supplier as s on k.supplierId = s.supplierId
+        inner join store as t on t.storeId = k.storeId
+        inner join ShopType as st on k.typeId = st.typeId
+        <where>
+            <if test="sName != null and sName != ''">
+                and k.sName like concat("%",#{sName},"%")
+            </if>
+        </where>
+        and  expiration <![CDATA[ > ]]> NOW() AND expiration <![CDATA[ <= ]]> DATE_SUB(CURDATE(),INTERVAL -1 MONTH)
+        limit #{offset},#{limit}
+
+    </select>
+
+
+</mapper>

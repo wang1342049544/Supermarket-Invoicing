@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.PermissionDao">
+
+<!--弹出来权限部分1-->
+ <select id="query" resultType="com.hdax.pojo.PermissionBean">
+        select permissionId as id,pName as text from permission where parentid = 0
+    </select>
+    <!--弹出来权限部分1-->
+    <select id="queryId" parameterType="long" resultType="com.hdax.pojo.PermissionBean">
+          select permissionId as id,pName as text from permission where parentid = #{parentid}
+    </select>
+
+
+
+    <select id="getPermissionByRoleId" resultType="permission" parameterType="int">
+        select permissionId as permissionId from  role_permission where  RoleId = #{roleId};
+    </select>
+
+
+
+    <select id="queryByPermissionIds" parameterType="list" resultType="permission">
+        select * from permission where permissionId in
+        <foreach collection="list" item="perid" open="(" separator="," close=")">
+            #{perid}
+        </foreach>
+
+    </select>
+
+
+
+</mapper>

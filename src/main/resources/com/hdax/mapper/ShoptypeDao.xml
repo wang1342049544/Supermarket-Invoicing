@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.ShoptypeDao">
+
+    <select id="queryAll" resultType="shopType">
+        select * from shoptype;
+    </select>
+
+    <select id="queryATT" resultType="shopType">
+        select * from shoptype;
+    </select>
+
+
+
+    <!--查询数量-->
+
+    <select id="getTotalCount" parameterType="string" resultType="long">
+
+        SELECT COUNT(1) FROM  shoptype
+
+        <where>
+            <if test="typeName != null and typeName != ''">
+                and typeName like concat("%",#{typeName},"%")
+            </if>
+         <!--   <if test="1==1">
+                and dengji =2
+            </if>-->
+        </where>
+
+    </select>
+
+    <!--分页查询-->
+
+    <select id="TJquery" parameterType="string" resultType="ShopType">
+        select * from shoptype
+        <where>
+            <if test="typeName != null and typeName != ''">
+                and typeName like concat("%",#{typeName},"%")
+            </if>
+            <!--<if test="1==1">
+                and dengji =2
+            </if>-->
+        </where>
+
+        limit #{offset},#{limit}
+
+    </select>
+
+
+
+
+
+
+
+
+
+    <!--添加信息-->
+    <insert id="addinfo" parameterType="ShopType">
+        insert into ShopType(typeName,dengji,shangji) values (#{typeName},#{dengji},#{shangji})
+    </insert>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.GshopDao">
+
+
+    <resultMap id="resultmap" type="gshop">
+        <result property="gShopId" column="gShopId"></result>
+        <result property="gShopName" column="gShopName"></result>
+        <result property="danWei" column="danWei"></result>
+        <result property="price" column="price"></result>
+        <result property="supplierId" column="supplierId"></result>
+        <result property="typeId" column="typeId"></result>
+        <result property="yileld" column="yileld"></result>
+        <result property="pledge" column="pledge"></result>
+        <result property="expiration" column="expiration"></result>
+        <result property="remake" column="remake"></result>
+
+        <association property="shoptypes" javaType="shoptype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+    </resultMap>
+
+
+    <!--查询总数量-->
+    <select id="getTotalCount" parameterType="int" resultType="long">
+
+        select count(1) from gshop where supplierId = #{supplierId}
+
+    </select>
+
+
+    <!--分页查询-->
+    <select id="queryTJ" resultMap="resultmap">
+
+        select * from GShop as g inner join shopType as s on g.typeId = s.typeId where supplierId = #{supplierId}  limit #{offset},#{limit}
+
+    </select>
+
+    <!--添加供货商商品-->
+    <insert id="InsertInfo" parameterType="gshop">
+        insert into GShop(gShopId,gShopName,danWei,price,supplierId,typeId,yileld,pledge,expiration) values (#{gShopId},#{gShopName},#{danWei},#{price},#{supplierId},#{typeId},#{yileld},#{pledge},#{expiration})
+    </insert>
+
+    <select id="MAXID" resultType="long">
+        select MAX(gShopId) from GShop
+    </select>
+
+</mapper>

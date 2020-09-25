@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.XsdetailsDao">
+
+    <insert id="InsertInfo" parameterType="xsdetails">
+        insert into XSdetails(number,buId,shopName,danWei,price,num,money,dh,zjifen) values
+        (#{number},#{buId},#{shopName},#{danWei},#{price},#{num},#{money},#{dh},#{zjifen})
+    </insert>
+
+    <!--根据单据号、商品编号查询数量-->
+    <select id="selectNum" resultType="xsdetails">
+        select buId,num from XSdetails where number = #{number} and buId = #{buId} and dh = #{dh}
+    </select>
+
+    <!--根据单据号、商品编号查询数量-->
+    <select id="selectNum2" resultType="xsdetails">
+        select * from XSdetails where number = #{number}
+    </select>
+
+    <!--根据单号查询信息-->
+    <select id="selectDH" resultType="xsdetails">
+        select * from xsdetails where number = #{number};
+    </select>
+
+
+    <!--查询全部商品-->
+
+    <select id="getAll" resultType="xsdetails">
+        select * from xsdetails limit 0,5
+    </select>
+
+
+    <!--推挤-->
+    <select id="times" resultType="String">
+        select date_sub(current_date(),interval #{day} day)
+    </select>
+
+    <select id="timesTotal" resultType="String">
+        select SUM(num) from xsdetails as X
+        inner join XsBills as s on x.number = s.number
+        where s.xsTime = #{xstime}
+    </select>
+
+    <!--总销量-->
+    <select id="zxl" resultType="xsdetails">
+        SELECT buId,shopName ,SUM(xsdetails.`money`) AS money  FROM xsdetails
+        INNER JOIN xsbills ON xsbills.`Number` = xsdetails.`number`
+        INNER JOIN kct ON kct.`KCId` =xsdetails.`buId`
+        <where>
+            <if test="typeId != null and typeId != ''">
+                and typeId like concat("%",#{typeId},"%")
+            </if>
+        </where>
+        and  bType = 3
+        GROUP BY buId
+        ORDER BY  SUM(xsdetails.`money`)  DESC
+        LIMIT 0,10
+    </select>
+
+
+    <!--最火的 销售数量 前10的商品 链接库存表-->
+    <select id="zxx" resultType="xsdetails">
+       SELECT buId,shopName,SUM(num)  AS num FROM xsdetails
+    INNER JOIN xsbills ON xsbills.`Number` = xsdetails.`number`
+         INNER JOIN kct ON kct.`KCId` =xsdetails.`buId`
+        <where>
+            <if test="typeId != null and typeId != ''">
+                and typeId like concat("%",#{typeId},"%")
+            </if>
+
+        </where>
+	   and  bType = 3
+	   GROUP BY buId
+        ORDER BY  SUM(num)  DESC
+         LIMIT 0,10
+    </select>
+
+    <!--最火的 销售额度数量 前10的商品 链接库存表-->
+    <select id="zxs" resultType="xsdetails">
+      SELECT buId,shopName ,SUM(xsdetails.`money`) AS money  FROM xsdetails
+          INNER JOIN xsbills ON xsbills.`Number` = xsdetails.`number`
+           INNER JOIN kct ON kct.`KCId` =xsdetails.`buId`
+        <where>
+            <if test="typeId != null and typeId != ''">
+                and typeId like concat("%",#{typeId},"%")
+            </if>
+        </where>
+        and  bType = 3
+         GROUP BY buId
+        ORDER BY  SUM(xsdetails.`money`)  DESC
+        LIMIT 0,10
+    </select>
+
+
+    <!--按年 月 统计 销售额度-->
+    <select id="zz" resultType="xsdetails">
+
+        SELECT   YEAR(xsTime) AS nian, MONTH(xsTime) AS yue ,SUM(xsdetails.`money`)AS money FROM xsdetails
+        INNER JOIN xsbills ON xsbills.`Number` = xsdetails.`number`
+
+        <where>
+            <if test="xsTime != null and xsTime != ''">
+                and YEAR(xsTime) like concat("%",#{xsTime},"%")
+            </if>
+        </where>
+        and  bType = 3
+        GROUP BY MONTH(xsTime)
+        ORDER BY MONTH(xsTime)
+
+    </select>
+
+   <!-- id-->
+
+
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.RdetailsDao">
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="rdetails">
+        insert into Rdetails(number,buId,buName,danWei,price,ynums,snums,money,supplierId,yileld,pledge,expiration,typeId,storeId) values
+        (#{number},#{buId},#{buName},#{danWei},#{price},#{ynums},#{snums},#{money},#{supplierId},#{yileld},#{pledge},#{expiration},#{typeId},#{storeId})
+    </insert>
+
+    <!--删除信息-->
+    <delete id="delInfo">
+        delete  from  rdetails where number = #{number}
+    </delete>
+
+    <!--result-->
+    <resultMap id="resultmap" type="rdetails">
+        <id property="id" column="id"></id>
+        <result property="number" column="number"></result>
+        <result property="buId" column="buId"></result>
+        <result property="buName" column="buName"></result>
+        <result property="danWei" column="danWei"></result>
+        <result property="price" column="price"></result>
+        <result property="ynums" column="ynums"></result>
+        <result property="snums" column="snums"></result>
+        <result property="money" column="money"></result>
+        <result property="supplierId" column="supplierId"></result>
+        <result property="yileld" column="yileld"></result>
+        <result property="pledge" column="pledge"></result>
+        <result property="expiration" column="expiration"></result>
+        <result property="typeId" column="typeId"></result>
+        <result property="storeId" column="storeId"></result>
+
+
+        <association property="supplier" javaType="supplier">
+            <id property="supplierId" column="supplierId"></id>
+            <result property="supName" column="supName"></result>
+        </association>
+
+        <association property="shoptype" javaType="shoptype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+        <association property="store" javaType="store">
+            <id property="storeId" column="storeId"></id>
+            <result property="storeName" column="storeName"></result>
+        </association>
+
+    </resultMap>
+
+    <!--根据编号查询-->
+    <select id="queryAll" resultMap="resultmap">
+       select * from rdetails as d inner join Supplier as s on d.supplierId = s.supplierId
+      inner join ShopType as st on d.typeId = st.typeId
+      inner join Store as se on d.storeId = se.storeId
+      where number = #{number}
+    </select>
+
+
+
+</mapper>

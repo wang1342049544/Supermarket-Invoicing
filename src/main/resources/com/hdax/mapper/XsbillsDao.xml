@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.XsbillsDao">
+
+
+    <!--result-->
+    <resultMap id="resultmap" type="xsbills">
+        <id property="id" column="id"></id>
+        <result property="number" column="number"></result>
+        <result property="khId" column="khId"></result>
+        <result property="bType" column="bType"></result>
+        <result property="xsTime" column="xsTime"></result>
+        <result property="money" column="money"></result>
+        <result property="jifen" column="jifen"></result>
+        <result property="managerId" column="managerId"></result>
+        <result property="idd" column="idd"></result>
+
+        <association property="manager" javaType="manager">
+            <id property="managerId" column="managerId"></id>
+            <result property="mname" column="mname"></result>
+        </association>
+
+        <association property="customer" javaType="customer">
+            <id property="id" column="id"></id>
+            <result property="cName" column="cName"></result>
+        </association>
+
+    </resultMap>
+
+    <!--添加信息-->
+        <insert id="InsertInfo" parameterType="xsbills">
+            insert into XSBills(khId,Number,bType,xsTime,money,jifen,managerId) values
+            (#{khId},#{number},#{bType},#{xsTime},#{money},#{jifen},#{managerId})
+        </insert>
+
+    <!--查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+        select count(1) from xsbills
+        <where>
+            <if test="number != '' and number != null">
+                 and number like concat("%",#{number},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <!--分页查询  酷虎m-->
+    <select id="selectTJ" parameterType="string" resultMap="resultmap">
+        select * from xsbills as s inner join Manager as m on s.managerId = m.managerId
+        inner join customer as c on s.khId = c.Id
+        <where>
+            <if test="number != '' and number != null">
+                and s.number like concat("%",#{number},"%")
+            </if>
+        </where>
+
+        limit #{offset},#{limit}
+    </select>
+
+
+    <!--分页查询  酷虎m-->
+   <select id="selectTJJ" parameterType="string" resultMap="resultmap">
+        select * from xsbills as s inner join Manager as m on s.managerId = m.managerId
+
+        <where>
+            <if test="number != '' and number != null">
+                and s.number like concat("%",#{number},"%")
+            </if>
+        </where>
+
+       and  khId != 1   AND khId != 2  AND   khId != 3  AND  khId != 4   AND  khId != 5 AND khId != 6 AND khId != 7
+       limit #{offset},#{limit}
+    </select>
+
+
+
+
+    <!--修改信息-->
+    <update id="updateInfo" parameterType="xsbills">
+            update XSBills set bType =1  where id = #{id}
+        </update>
+<!--  驳回原因idd-->
+    <update id="updateInfo1" parameterType="xsbills">
+            update XSBills set bType =2 ,idd=#{idd}  where id = #{id}
+        </update>
+
+    <update id="updateInfo2" parameterType="xsbills">
+            update XSBills set bType =3  where id = #{id}
+        </update>
+ <!--   修改成为 退货申请中-->
+     <update id="updateInfo4" parameterType="xsbills">
+            update XSBills set bType =4 ,idd=#{idd} where id = #{id}
+        </update>
+
+    <!--   修改成为 退货申请中-->
+    <update id="updateInfo5" parameterType="xsbills">
+            update XSBills set bType =5  where id = #{id}
+        </update>
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.billsDao">
+
+    <resultMap id="resultmap" type="bills">
+        <id property="id" column="id"></id>
+        <result property="number" column="number"></result>
+        <result property="typeId" column="typeId"></result>
+        <result property="danTime" column="danTime"></result>
+        <result property="storeId" column="storeId"></result>
+        <result property="yingF" column="yingF"></result>
+        <result property="shiF" column="shiF"></result>
+        <result property="managerId" column="managerId"></result>
+        <result property="czy" column="czy"></result>
+        <result property="auditId" column="auditId"></result>
+        <result property="remake" column="remake"></result>
+
+
+        <association property="billstype" javaType="billstype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+        <association property="store" javaType="store">
+            <id property="storeId" column="storeId"></id>
+            <result property="storeName" column="storeName"></result>
+        </association>
+
+        <association property="manager" javaType="manager">
+            <id property="managerId" column="managerId"></id>
+            <result property="mname" column="mname"></result>
+        </association>
+
+        <association property="audit" javaType="audit">
+            <id property="auditId" column="auditId"></id>
+            <result property="auditName" column="auditName"></result>
+        </association>
+
+    </resultMap>
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="bills">
+        insert into bills(number,typeId,danTime,storeId,yingF,shiF,managerId,czy,auditId,remake) values (#{number},#{typeId},#{danTime},#{storeId},#{yingF},#{shiF},#{managerId},#{czy},#{auditId},#{remake})
+    </insert>
+
+    <!--查询-->
+    <select id="queryAll" resultType="bills">
+        select * from bills
+    </select>
+
+    <!--查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+        select count(*) from bills
+
+        <where>
+            <if test="number != null and number != ''">
+                and number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and storeId = #{storeId}
+            </if>
+            <if test="1==1">
+                and auditId = 2
+            </if>
+
+        </where>
+
+    </select>
+
+    <select id="getTotalCountS" parameterType="string" resultType="long">
+        select count(*) from bills
+
+        <where>
+            <if test="number != null and number != ''">
+                and number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and storeId = #{storeId}
+            </if>
+            <if test="1==1">
+                and auditId = 1
+            </if>
+        </where>
+    </select>
+
+    <!--未审核分页查询-->
+    <select id="queryFY" resultMap="resultmap">
+      select * from bills as b inner join billsType as bt on b.typeId = bt.typeId
+      inner join Store as s on b.storeId = s.storeId
+      inner join audit as a on a.auditId = b.auditId
+        <where>
+            <if test="number != null and number != ''">
+                and b.number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and b.storeId = #{storeId}
+            </if>
+        </where>
+      and b.auditId = 2 limit #{offset},#{limit}
+    </select>
+
+    <!--已审核分页查询-->
+    <select id="queryFYS" resultMap="resultmap">
+            select * from bills as b inner join billsType as bt on b.typeId = bt.typeId
+            inner join Store as s on b.storeId = s.storeId
+            inner join audit as a on a.auditId = b.auditId
+        <where>
+            <if test="number != null and number != ''">
+                and b.number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and b.storeId = #{storeId}
+            </if>
+        </where>
+        and b.auditId = 1 limit #{offset},#{limit}
+    </select>
+
+    <!--修改审核状态-->
+    <update id="updateInfo" parameterType="bills">
+              update bills set auditId = 1 where number = #{number}
+    </update>
+
+    <!--修改仓库-->
+    <update id="update" parameterType="bills">
+                  update bills set    storeId = #{storeId} where Id = #{id}
+    </update>
+
+
+    <!--查询审核状态是否已经通过-->
+    <select id="TongG" resultType="int">
+        select auditId from bills where number = #{number}
+    </select>
+
+
+    <!--删除单据-->
+    <delete id="delInfo">
+        delete from bills where number = #{number}
+    </delete>
+
+</mapper>

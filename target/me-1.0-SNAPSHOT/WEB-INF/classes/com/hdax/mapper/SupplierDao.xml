@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.SupplierDao">
+
+        <resultMap id="resultMap" type="Supplier">
+            <id property="supplierId" column="supplierId"></id>
+            <result property="supName" column="supName"></result>
+            <result property="phone" column="phone"></result>
+            <result property="address" column="address"></result>
+            <result property="stateId" column="stateId"></result>
+            <result property="typeId" column="typeId"></result>
+
+            <!--外键-->
+            <association property="supptype" javaType="supptype">
+                <result property="typeName" column="typeName"></result>
+            </association>
+        </resultMap>
+
+    <!--查询-->
+    <select id="query" resultMap="resultMap">
+          select * from supplier as p inner join supptype as t on p.typeId = t.typeId
+    </select>
+
+
+    <!--查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+        select COUNT(1) from supplier
+
+        <where>
+            <if test="supName != null and supName != ''">
+                and supName like concat("%",#{supName},"%")
+            </if>
+        </where>
+
+    </select>
+
+
+    <!--分页条件查询-->
+    <select id="TJquery" parameterType="string" resultMap="resultMap">
+
+        select * from supplier as p inner join Supptype as t on p.typeId = t.typeId
+        <where>
+            <if test="supName != null and supName != ''">
+                and p.supName like concat("%",#{supName},"%")
+            </if>
+        </where>
+        limit #{offset},#{limit}
+
+    </select>
+
+    <!--添加信息-->
+    
+    <insert id="insertInfo" parameterType="supplier">
+          insert into supplier(supName,phone,address,stateId,typeId) values (#{supName},#{phone},#{address},#{stateId},#{typeId})
+    </insert>
+
+    <!--修改信息-->
+    <update id="updateInfo" parameterType="supplier">
+        update supplier set supName = #{supName},phone = #{phone},address = #{address},typeId = #{typeId} where supplierId = #{supplierId}
+    </update>
+
+    <!--删除-->
+
+    <delete id="delInfo">
+
+        delete from supplier where supplierId in
+
+        <foreach collection="array" open="(" separator="," close=")" item="supplierId">
+            #{supplierId}
+        </foreach>
+
+    </delete>
+
+
+
+</mapper>

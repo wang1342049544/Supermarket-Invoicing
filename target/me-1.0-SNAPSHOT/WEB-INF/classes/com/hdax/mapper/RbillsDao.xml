@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.RbillsDao">
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="rbills">
+        insert into rbills(number,typeId,danTime,storeId,yingF,shiF,managerId,czy,stateId,remake) values (#{number},#{typeId},#{danTime},#{storeId},#{yingF},#{shiF},#{managerId},#{czy},#{stateId},#{remake})
+    </insert>
+
+    <!--resultmap-->
+    <resultMap id="resultmap" type="rbills">
+        <id property="id" column="id"></id>
+        <result property="number" column="number"></result>
+        <result property="typeId" column="typeId"></result>
+        <result property="danTime" column="danTime"></result>
+        <result property="storeId" column="storeId"></result>
+        <result property="yingF" column="yingF"></result>
+        <result property="shiF" column="shiF"></result>
+        <result property="managerId" column="managerId"></result>
+        <result property="czy" column="czy"></result>
+        <result property="auditId" column="auditId"></result>
+        <result property="remake" column="remake"></result>
+
+
+        <association property="billstype" javaType="billstype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+        <association property="store" javaType="store">
+            <id property="storeId" column="storeId"></id>
+            <result property="storeName" column="storeName"></result>
+        </association>
+
+        <association property="manager" javaType="manager">
+            <id property="managerId" column="managerId"></id>
+            <result property="mname" column="mname"></result>
+        </association>
+
+    </resultMap>
+
+
+    <!--未审核查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+        select count(*) from rbills
+
+        <where>
+            <if test="number != null and number != ''">
+                and number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and storeId = #{storeId}
+            </if>
+            <if test="1==1">
+                and stateId = 0
+            </if>
+        </where>
+
+    </select>
+
+    <!--已审核查询数量-->
+    <select id="getTotalCountS" parameterType="string" resultType="long">
+        select count(*) from rbills
+
+        <where>
+            <if test="number != null and number != ''">
+                and number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and storeId = #{storeId}
+            </if>
+            <if test="1==1">
+                and stateId = 1
+            </if>
+        </where>
+
+    </select>
+
+    <!--未审核-->
+    <select id="queryFY" resultMap="resultmap">
+        select * from rbills as b inner join billsType as bt on b.typeId = bt.typeId
+        inner join Store as s on b.storeId = s.storeId
+
+        <where>
+            <if test="number != null and number != ''">
+                and b.number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and b.storeId = #{storeId}
+            </if>
+        </where>
+        and b.stateId = 0 limit #{offset},#{limit}
+    </select>
+
+    <!--已审核-->
+    <select id="queryFYS" resultMap="resultmap">
+        select * from rbills as b inner join billsType as bt on b.typeId = bt.typeId
+        inner join Store as s on b.storeId = s.storeId
+
+        <where>
+            <if test="number != null and number != ''">
+                and b.number = #{number}
+            </if>
+            <if test="storeId != 0">
+                and b.storeId = #{storeId}
+            </if>
+        </where>
+        and b.stateId = 1 limit #{offset},#{limit}
+    </select>
+
+    <!--修改审核状态-->
+    <update id="updateInfo" parameterType="rbills">
+              update rbills set stateId = 1 where number = #{number}
+    </update>
+    <!--查询审核状态是否已经通过-->
+    <select id="TongG" resultType="int">
+        select stateId from rbills where number = #{number}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.ManagerMapper">
+    <!--查询全部-->
+
+
+    <resultMap id="resultmap" type="Manager">
+            <id property="managerId" column="managerId"></id>
+            <result property="mname" column="mname"></result>
+            <result property="password" column="password"></result>
+            <result property="photo" column="photo"></result>
+            <result property="phone" column="phone"></result>
+            <result property="address" column="address"></result>
+            <result property="state" column="state"></result>
+            <result property="roleId" column="roleId"></result>
+         <result property="salt" column="salt"></result>
+
+        <association property="role" javaType="role">
+            <result property="roleName" column="roleName"></result>
+        </association>
+    </resultMap>
+
+
+    <!--    根据usercode查询-->
+    <select id="Find" resultMap="resultmap" parameterType="string">
+        select * from Manager where Mname=#{mname}
+    </select>
+
+
+    <!--查询全部-->
+    <select id="Mquery" resultType="Manager">
+        select * from Manager
+    </select>
+
+    <!--查询数量-->
+
+    <select id="getTotalCount" parameterType="string" resultType="long">
+
+        select count(1) from manager
+
+        <where>
+            <if test="mname != null and mname != ''">
+                and mname like concat("%",#{mname},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <!--分页查询-->
+
+    <select id="TJquery" parameterType="string" resultMap="resultmap">
+        select * from Manager as m inner join role as r on m.roleId = r.roleId
+
+        <where>
+            <if test="mname != null and mname != ''">
+                and m.mname like concat("%",#{mname},"%")
+            </if>
+        </where>
+        limit #{offset},#{limit}
+
+    </select>
+
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="manager">
+        insert into Manager(Mname,photo,phone,address,state,roleId) values (#{mname},#{photo},#{phone},#{address},#{state},#{roleId})
+    </insert>
+
+
+    <!--修改信息-->
+    <update id="updateInfo" parameterType="manager">
+            update Manager set mname = #{mname},phone = #{phone},address = #{address},roleId = #{roleId} where ManagerId = #{managerId}
+        </update>
+
+    <!--删除信息-->
+    <delete id="delInfo">
+        delete from Manager where ManagerId in
+
+        <foreach collection="array" open="(" separator="," close=")" item="ManagerId">
+            #{ManagerId}
+        </foreach>
+
+    </delete>
+
+    <!--查询最大的ID值-->
+    <select id="MaxId" resultType="int">
+        select MAX(managerId) from Manager
+    </select>
+
+    <!--条件查询-->
+    <select id="tjQuery" resultType="Manager">
+        select * from manager where roleId = #{roleId};
+    </select>
+
+</mapper>

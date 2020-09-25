@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.KhshopDao">
+
+    <!--分页查询-->
+    <select id="queryTJ" resultType="khshop">
+        select * from  khshop limit #{offset},#{limit}
+    </select>
+
+    <!--查询数量-->
+    <select id="getTotalCountS" parameterType="string" resultType="long">
+        select count(1) from khshop
+    </select>
+
+    <!--添加信息-->
+    <insert id="InsertInfo" parameterType="khshop">
+        insert into KHShop(buId,buName,danWei,num,price,money,dh,zjifen) values
+        (#{buId},#{buName},#{danWei},#{num},#{price},#{money},#{dh},#{zjifen})
+    </insert>
+
+    <!--查询相同商品-->
+    <select id="selectXT" resultType="string">
+        select num from KHShop where buId = #{buId} and dh = #{dh}
+    </select>
+
+    <!--修改数量-->
+    <update id="updlist" parameterType="khshop">
+        update KHShop set num = #{num},money = #{money} where buId = #{buId} and dh = #{dh};
+    </update>
+
+    <!--总积分-->
+    <update id="updlists" parameterType="khshop">
+        update KHShop set num = #{num},zjifen = #{zjifen} where buId = #{buId} and dh = #{dh};
+    </update>
+
+    <!--查询商品详细信息-->
+    <select id="queryInfo" resultType="khshop">
+        select * from KHShop where buId = #{buId} and dh = #{dh}
+    </select>
+
+    <!--删除信息-->
+    <delete id="delInfo">
+        delete from khshop where buId = #{buId}
+    </delete>
+
+</mapper>

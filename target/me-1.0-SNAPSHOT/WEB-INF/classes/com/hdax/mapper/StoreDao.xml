@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.StoreDao">
+
+    <select id="query" resultType="Store">
+          select * from Store
+    </select>
+
+    <!--查询数量-->
+
+    <select id="getTotalCount" parameterType="string" resultType="long">
+
+        select count(1) from Store
+
+        <where>
+            <if test="storeName != null and storeName != ''">
+                and storeName like concat("%",#{storeName},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <!--分页查询-->
+
+    <select id="TJquery" parameterType="string" resultType="Store">
+        select * from Store
+        <where>
+            <if test="storeName != null and storeName != ''">
+                and storeName like concat("%",#{storeName},"%")
+            </if>
+        </where>
+        limit #{offset},#{limit}
+
+    </select>
+
+    <!--分页查询-->
+
+    <select id="TT" parameterType="string" resultType="Store">
+    SELECT id,kct.`storeId`,sname,nums FROM kct
+    JOIN store ON store.`storeId` = kct.`storeId`
+        <where>
+            <if test="storeId != null and storeId != ''">
+                and kct.storeId = #{storeId}
+            </if>
+        </where>
+    </select>
+
+
+
+
+    <!--添加信息-->
+    <insert id="addinfo" parameterType="Store">
+        insert into Store(storeName,phone,address,remake,state) values (#{storeName},#{phone},#{address},#{remake},#{state})
+    </insert>
+
+
+    <!--修改信息-->
+    <update id="updateInfo" parameterType="Store">
+            update Store set storeName = #{storeName},phone = #{phone},address = #{address},remake = #{remake},state = #{state}  where storeId = #{storeId}
+        </update>
+
+  <!--  &lt;!&ndash;删除信息&ndash;&gt;
+    <delete id="delInfo">
+        delete from Store where storeId in
+
+        <foreach collection="array" open="(" separator="," close=")" item="storeId">
+            #{storeId}
+        </foreach>
+
+    </delete>-->
+
+
+
+    <delete id="delInfo">
+        delete from Store where storeId=#{storeId}
+    </delete>
+</mapper>

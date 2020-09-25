@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.RoleDao">
+
+   <!-- 全查-->
+    <select id="queryAll" resultType="Role">
+          select * from role
+    </select>
+
+    <!--添加-->
+    <insert id="InsertInfo" parameterType="Role">
+        insert into role(roleName) values (#{roleName})
+    </insert>
+
+    <!--删除-->
+    <delete id="delInfo">
+
+        delete from Role where roleId in
+
+        <foreach collection="array" open="(" separator="," close=")" item="roleId">
+            #{roleId}
+        </foreach>
+
+    </delete>
+
+    <!--修改-->
+        <update id="updateInfo" parameterType="role">
+            update role set roleName = #{roleName} where roleId = #{roleId}
+        </update>
+
+    <select id="getRoleByUserId" resultType="role" parameterType="long">
+
+          select Role.`roleId`,Role.`roleName` from Role
+          inner join Manager_Role
+          on Role.`roleId` = Manager_Role.`roleId`
+          inner join Manager
+          on Manager_Role.`ManagerId` = Manager.`ManagerId`
+          where Manager.`ManagerId` = #{ManagerId}
+
+    </select>
+
+</mapper>

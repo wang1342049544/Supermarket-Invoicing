@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.mapper.customerDao">
+    <!--查询全部-->
+    <select id="Mquery" resultType="customer">
+        select * from customer
+    </select>
+
+
+    <!--查询数量-->
+
+    <select id="getTotalCount" parameterType="string" resultType="long">
+
+        select count(1) from customer
+
+        <where>
+            <if test="cName != '' and cName != null">
+                cName like concat("%",#{cName},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <!--分页查询-->
+
+    <select id="TJquery" parameterType="string" resultType="customer">
+        select * from customer
+
+        <where>
+            <if test="cName != '' and cName != null">
+                and cName like concat("%",#{cName},"%")
+            </if>
+        </where>
+       limit #{offset},#{limit}
+    </select>
+
+
+    <!--添加信息-->
+    <insert id="addinfo" parameterType="customer">
+        insert into customer(cName,phone,address) values (#{cName},#{phone},#{address})
+    </insert>
+
+
+    <!--修改信息-->
+        <update id="updateInfo" parameterType="customer">
+            update customer set cName = #{cName},phone = #{phone},address = #{address} where id = #{id}
+        </update>
+
+    <!--删除信息-->
+    <delete id="delInfo">
+        delete from customer where id in
+
+        <foreach collection="array" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+
+    </delete>
+
+    <!--查询积分-->
+    <select id="selectJifen" parameterType="int" resultType="int">
+        select jifen from customer where id = #{id}
+    </select>
+
+    <!--修改积分-->
+    <update id="updJi" parameterType="customer">
+        update customer set jifen = #{jifen} where id = #{id}
+    </update>
+
+
+</mapper>

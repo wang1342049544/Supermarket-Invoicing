@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hdax.mapper.SalesDao">
+
+
+    <resultMap id="resultmap" type="sales">
+        <id property="id" column="id"></id>
+        <result property="buId" column="buId"></result>
+        <result property="buName" column="buName"></result>
+        <result property="danWei" column="danWei"></result>
+        <result property="num" column="num"></result>
+        <result property="price" column="price"></result>
+        <result property="typeId" column="typeId"></result>
+        <result property="yileld" column="yileld"></result>
+        <result property="pledge" column="pledge"></result>
+        <result property="expiration" column="expiration"></result>
+        <result property="jifen" column="jifen"></result>
+        <result property="touxiang" column="touxiang"></result>
+
+        <result property="dh" column="dh"></result>
+
+        <association property="shoptype" javaType="shoptype">
+            <id property="typeId" column="typeId"></id>
+            <result property="typeName" column="typeName"></result>
+        </association>
+
+    </resultMap>
+
+    <!--查询数量-->
+    <select id="getTotalCount" parameterType="string" resultType="long">
+        select count(1) from sales
+        <where>
+            <if test="typeId != 0">
+                and typeId = #{typeId}
+            </if>
+            <if test="buName != null and  buName != ''">
+                and buName like concat("%",#{buName},"%")
+            </if>
+        </where>
+    </select>
+
+    <!--分页查询-->
+    <select id="queryTJ" parameterType="string" resultMap="resultmap">
+        select * from Sales as s inner join ShopType as st on s.typeId = st.typeId
+        <where>
+            <if test="typeId != 0">
+                and s.typeId = #{typeId}
+            </if>
+            <if test="buName != null and  buName != ''">
+                and s.buName like concat("%",#{buName},"%")
+            </if>
+        </where>
+        order by s.id limit #{offset},#{limit}
+    </select>
+
+    <!--根据编号查询数量-->
+    <select id="getCount" resultType="long">
+        select num from Sales where buId = #{buId}
+    </select>
+
+    <!--修改数量-->
+    <update id="updnum" parameterType="sales">
+        update sales set num = #{num} where buId = #{buId}
+    </update>
+
+    <!--查询库存报警信息-->
+    <select id="selectBJ" resultType="sales">
+        select * from Sales where 50 >= num
+    </select>
+
+    <!--查询数量和Id-->
+    <select id="getCounts" resultType="sales">
+        select * from Sales where buId = #{buId}
+    </select>
+
+
+    <!--查询所有的数量-->
+    <select id="Count" resultType="sales">
+        select * from sales
+    </select>
+
+
+</mapper>
